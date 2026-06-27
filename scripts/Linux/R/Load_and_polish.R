@@ -1,4 +1,4 @@
-#the feature count.txt file was loaded and reordered
+#THE FEATURE COUNT GENERATED WAS LOADED IN R
 
 count<-read.delim("final_feature_count.txt",header = FALSE,sep = "\t")
 View(count)
