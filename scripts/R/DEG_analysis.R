@@ -120,3 +120,69 @@ edge_res_down<-subset(res_condition_edge, FDR < 0.05 & logFC < -0.5)
 
 
 edge_res_up<-subset(res_condition_edge, FDR < 0.05 & logFC > 0.5)
+
+
+
+#==================================combining all three(intersection)===================================
+#==============upregulated===========================
+library(dplyr)
+
+# Read files
+upreg_deseq <- read.csv("DESEQ2_upregulated.csv")
+upreg_edgeR <- read.csv("edgeR_upreg(condition).csv")
+upreg_limma <- read.csv("Limma_upreg(condition).csv")
+
+# Standardize gene column name
+colnames(upreg_deseq)[1] <- "genes"
+colnames(upreg_edgeR)[1] <- "genes"
+colnames(upreg_limma)[1] <- "genes"
+
+colnames(upreg_deseq)
+colnames(upreg_edgeR)
+colnames(upreg_limma)
+
+# If raw p-values exist, adjust them
+upreg_deseq <- upreg_deseq %>% rename(adj_p_DESeq2 = padj)
+upreg_edgeR <- upreg_edgeR %>% rename(adj_p_edgeR = FDR)
+upreg_limma <- upreg_limma %>% rename(adj_p_limma = adj.P.Val)
+
+# Merge on common genes
+common_genes <- Reduce(intersect, list(upreg_deseq$genes,
+                                       upreg_edgeR$genes,
+                                       upreg_limma$genes))
+
+
+
+#====================downregulated==========================
+downreg_deseq<-read.csv("DESEQ2_downregulated.csv")
+downreg_edgeR<-read.csv("edgeR_downreg(condition).csv")
+downreg_limma<-read.csv("Limma_downreg(condition).csv")
+# Standardize gene column name
+colnames(downreg_deseq)[1] <- "genes"
+colnames(downreg_edgeR)[1] <- "genes"
+colnames(downreg_limma)[1] <- "genes"
+
+colnames(downreg_deseq)
+colnames(downreg_edgeR)
+colnames(downreg_limma)
+
+
+# If raw p-values exist, adjust them
+downreg_deseq <- downreg_deseq %>% rename(adj_p_DESeq2 = padj)
+downreg_edgeR <- downreg_edgeR %>% rename(adj_p_edgeR = FDR)
+downreg_limma <- downreg_limma %>% rename(adj_p_limma = adj.P.Val)
+
+# Merge on common genes
+common_genes <- Reduce(intersect, list(downreg_deseq$genes,
+                                       downreg_edgeR$genes,
+                                       downreg_limma$genes))
+
+common_table <- downreg_deseq %>% filter(genes %in% common_genes) %>%
+  select(genes, adj_p_DESeq2) %>%
+  inner_join(downreg_edgeR %>% filter(genes %in% common_genes) %>% select(genes, adj_p_edgeR), by = "genes") %>%
+  inner_join(downreg_limma %>% filter(genes %in% common_genes) %>% select(genes, adj_p_limma), by = "genes")
+
+common_table <- upreg_deseq %>% filter(genes %in% common_genes) %>%
+  select(genes, adj_p_DESeq2) %>%
+  inner_join(upreg_edgeR %>% filter(genes %in% common_genes) %>% select(genes, adj_p_edgeR), by = "genes") %>%
+  inner_join(upreg_limma %>% filter(genes %in% common_genes) %>% select(genes, adj_p_limma), by = "genes")
