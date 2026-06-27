@@ -62,7 +62,7 @@ How to Reproduce
 3. Generate counts:
    featureCounts -T 8 -p -a annotation.gtf -o counts.txt *.sorted.bam
 
-4. Run DEG + Elastic Net in R (see scripts in /R_scripts).
+4. Run DEG + Elastic Net in R (see R in scripts/).
 
 5. Validate selected genes using TWAS Hub & TWAS Atlas.
 
