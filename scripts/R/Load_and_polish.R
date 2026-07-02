@@ -34,7 +34,6 @@ count <- count[, c("Geneid", sorted_cols)]
 library(biomaRt)
 
 # Load your count matrix file
-#count_data <- read.csv("new count(202479).csv", stringsAsFactors = FALSE)
 
 # Extract original gene identifiers
 original_ids <- as.character(count[[1]])
